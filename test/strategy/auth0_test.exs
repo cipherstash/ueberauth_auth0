@@ -95,6 +95,17 @@ defmodule Ueberauth.Strategy.Auth0Test do
       assert conn.resp_body =~ ~s|organization=org_abc123|
       assert conn.resp_body =~ ~s|invitation=INVITE2022|
     end
+
+    test "hacky parameter test" do
+      conn =
+        :get
+        |> conn("/auth/auth0?v=foo&via=bar&product=baz")
+        |> SpecRouter.call(@router)
+
+      assert conn.resp_body =~
+               ~s|redirect_uri=http%3A%2F%2Fwww.example.com%2Fauth%2Fauth0%2Fcallback%3Fproduct%3Dbaz%26v%3Dfoo%26via%3Dbar|
+    end
+
   end
 
   describe "handle_callback!" do

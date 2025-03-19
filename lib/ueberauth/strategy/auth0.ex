@@ -99,6 +99,11 @@ defmodule Ueberauth.Strategy.Auth0 do
       |> option(:allowed_request_params)
       |> Enum.map(&to_string/1)
 
+    # TODO: make a proper API to allow specifying which params are allowed
+    query_params = conn.params
+      |> Map.take(["product", "via", "v"])
+      |> Map.to_list()
+
     opts =
       conn.params
       |> maybe_replace_param(conn, "scope", :default_scope)
@@ -114,7 +119,7 @@ defmodule Ueberauth.Strategy.Auth0 do
       # Remove empty params
       |> Enum.reject(fn {_, v} -> blank?(v) end)
       |> Enum.map(fn {k, v} -> {String.to_existing_atom(k), v} end)
-      |> Keyword.put(:redirect_uri, callback_url(conn))
+      |> Keyword.put(:redirect_uri, callback_url(conn, query_params))
 
     module = option(conn, :oauth2_module)
 
